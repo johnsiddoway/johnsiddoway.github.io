@@ -14,23 +14,23 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: Maps and Gold
+author: John Siddoway
 email: john.pez.s@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   A personal blog, covering topics such as software engineering, video games,
   and tabletop gaming.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
-#twitter_username: jekyllrb
 github_username:  Pezmotion
 repository: Pezmotion/pezmotion.github.io
+copyright: 2018-2019
 
 # Build settings
 markdown: kramdown
-theme: jekyll-theme-midnight
-plugins:
-  - jekyll-feed
+#plugins:
+#  - jekyll-feed
 sass:
-  sass_dir: css
+  sass_dir: assets/css
 
 # Exclude from processing.
 # The following items will not be processed, by default. Create a custom list

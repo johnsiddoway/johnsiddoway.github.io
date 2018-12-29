@@ -1,0 +1,33 @@
+---
+---
+
+@import 'variables';
+@import 'bootstrap/bootstrap';
+@import 'syntax';
+@import 'jekyll-clean-dark'; // uses some variables from bootstrap
+
+body {
+  background: $gray-950 url('/assets/img/asfalt-light.png');
+}
+
+main {
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-radius: .25rem;
+}
+
+footer {
+  background-color: $gray-850;
+  font: normal 16px sans-serif;
+  padding: 1.5rem 1.75rem;
+  text-align: center;
+
+  p {
+    margin-bottom: 0.25em;
+  }
+}
+
+nav {
+  border-top: 3px $primary solid;
+  border-bottom: 1px $black solid;
+}

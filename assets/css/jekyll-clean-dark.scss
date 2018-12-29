@@ -1,0 +1,70 @@
+//********************************************************
+// Blockquote
+//********************************************************
+blockquote {
+    border-left: 2px solid #666;
+    padding-left: 20px;
+    font-style: italic;
+}
+  
+//********************************************************
+// Table
+//********************************************************
+main > table {
+    background-color: $gray-850;
+    margin: 0 auto 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+
+    tbody {
+        box-shadow: inset 0 1px 10px rgba(0, 0, 0, 0.3), 0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.5);
+    }
+
+    th {
+        text-transform: uppercase;
+        text-align: center;
+        padding: .5em .75em;
+    }
+    td {
+        padding: .5em;
+    }
+    &.wide {
+        width: 100%;
+        max-width: 100%;
+    }
+    &.inner-borders {
+        border-collapse: collapse;
+        border-style: hidden;
+        td {
+            border: 1px solid #5e5e5e;
+        }
+    }
+}
+//********************************************************
+//       Custom classes to apply to block elements,
+//  more info: http://pavelmakhov.com/2015/12/images-in-jekyll
+//********************************************************
+.key {
+    font-size: 1.0em;
+    box-shadow: 1px 0 1px 0 #555, 0 1px 0 2px #888, 0 2px 0 2px #777;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    margin: 2px 3px;
+    padding: 0px 5px;
+}
+.filename {
+    background-color: $gray-950;
+    color: lightgrey;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    margin: 0;
+    font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
+    border-left: 0;
+    bottom: -2px;
+    position: relative;
+    padding: 0 0 2px 1em;
+    p {
+        margin: 0;
+    }
+}
