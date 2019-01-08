@@ -1,6 +1,6 @@
 ---
 title:  "Star Rating"
-date:   2018-12-28
+date:   2018-12-29
 description: Creating a basic star rating using some custom CSS and Font Awesome 5
 tags: css font-awesome-5
 custom-js:
