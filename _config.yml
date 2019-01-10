@@ -26,6 +26,7 @@ repository: Pezmotion/pezmotion.github.io
 copyright: 2018-2019
 
 # Build settings
+highlighter: rouge
 markdown: kramdown
 #plugins:
 #  - jekyll-feed

@@ -3,9 +3,10 @@
 
 @import 'variables';
 @import 'bootstrap/bootstrap';
-@import 'syntax';
 @import 'jekyll-clean-dark'; // uses some variables from bootstrap
+@import 'native'; // pygments theme
 
+/* Custom styling */
 body {
   background: $gray-850 url('/assets/img/black-linen.png');
 }
