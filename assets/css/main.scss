@@ -8,7 +8,7 @@
 
 /* Custom styling */
 body {
-  background: $gray-850 url('/assets/img/black-linen.png');
+  background: $gray-850 url({{'/assets/img/black-linen.png'|relative_url}});
 }
 
 main {
