@@ -1,6 +1,6 @@
 ---
 title:  "Azure Search Part 2"
-date:   2019-01-06
+date:   2019-01-10
 description: Discussing my experience with Azure Search
 tags: azure
 ---
@@ -11,7 +11,7 @@ In Pirate Radio 1.0, I did this in a *very* complicated manner, building Linq Pr
 
 For Pirate Radio v2.0, I knew I wanted something better, but I didn't want to spend a lot of time rolling my own solution. So for my first pass, I dropped the code generation and just returned results where the entire search string was in the Artist Name, Album Name, or Track Title fields. So searching for 'The Beatles Yellow Submarine' would return nothing, but 'Yellow Submarine' would return just tracks on the Yellow Submarine album or the Yellow Submarine song on other albums. Simple and workable, but not great. This was still sub-optimal architecture.
 
-For Pirate Radio v2.next, I decided to try out Azure Search to provide a more intuitive search experience. I found a few decent resources on how to set it up, which I will link at the bottom. I actually didn't like Microsoft's official docs, because there was so much content it was tough to figure out where to start. Instead of just re-writing these guides, I plan on expanding on them by providing my experiences.
+For Pirate Radio v2.next, I decided to try out Azure Search to provide a more intuitive search experience. I found a few decent resources on how to set it up, which I will link at the bottom. I actually didn't like Microsoft's official docs, because there was so much content it was tough to figure out where to start. Instead of just re-writing these guides, I plan on expanding on them by showing a more "real world" example of how I'm using it.
 
 ### Why Azure
 There are a few options out there for hosted search engines. My top three options were Algolia, Amazon AWS CloudSearch, and Azure Search. According to the [AWS CloudSearch Pricing](https://aws.amazon.com/cloudsearch/pricing/) page, CloudSearch does not have an "always free" tier. Algolia has a [Free For Open Source](https://www.algolia.com/for-open-source) pricing tier, and Azure has an [Always-Free Tier](https://azure.microsoft.com/en-us/free/#always-free). I ended up going with Azure because Pirate Radio is actually a private repo, and I didn't want to bother with changing it or applying for free pricing when Azure already had what I needed for my simple testing:

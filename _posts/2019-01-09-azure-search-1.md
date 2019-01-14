@@ -1,11 +1,11 @@
 ---
 title:  "Azure Search Part 1"
-date:   2019-01-06
+date:   2019-01-09
 description: Plugging Azure Search into Pirate Radio
 tags: azure
 ---
 ### Overview
-There are a few good "starter" guides for Azure Search, and I've linked to a few of them at the bottom. As I was writing up my experiences with following these guides, I noticed that my blog post was turning into a novella. So I am splitting it up into two portions: this post will cover the specifics of what I did, and the next post will be my rationale for choosing Azure, my opinions, and thoughts on the experience.
+There are a few good "starter" guides for Azure Search, and I've linked to a few of them at the bottom. As I was writing up my experiences with following these guides, I noticed that my blog post was turning into a novella. So I have split it up into two portions: this post will cover the specifics of what I did, and the next post will be my rationale for choosing Azure, my opinions, and thoughts on the experience.
 
 The short version:
 1. Create an instance of the Search Service.
@@ -26,31 +26,15 @@ There are several ways to create the search service and index. I found that the 
 #### Populate Index
 Once you have the service and index defined, you can start shoving data into it. To start, you'll end up pushing all of your existing records into the index, but once the index is set up you'll just need to figure out a way to push updates to Azure. To seed my index, I needed to first define a class that matched the format of the index model, and then push data to Azure in this format.
 
-> TrackModel.cs
+> TrackDocument.cs
 {:.filename}
 {% highlight csharp %}
-public class TrackModel {
+public class TrackDocument {
     public string TrackKey { get; set; }
     public string TrackTitle { get; set; }
     public string ArtistName { get; set; }
     public string AlbumName { get; set; }
     public string GenreName { get; set; }
-
-    public TrackModel() { }
-
-    /**
-    * Used to generate a Track Model from a DB entry.
-    * This is used to push new Track Documents to the Index.
-    */
-    public static TrackModel FromDatabaseEntity(Track t) {
-        return new TrackModel() {
-            TrackKey = t.TrackKey.ToString(),
-            TrackTitle = t.TrackTitle,
-            ArtistName = t.Artist.ArtistName,
-            AlbumName = t.AlbumName,
-            GenreName = t.Genre.GenreName
-        };
-    }
 }
 {% endhighlight %}
 
@@ -59,7 +43,7 @@ public class TrackModel {
 {% highlight csharp %}
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
-using PirateRadio.AzureSearch;
+using PirateRadio.Search;
 using PirateRadio.Data;
 using System;
 using System.Collections.Generic;
@@ -70,16 +54,28 @@ public class Backfill {
         PirateRadioContext context = new PirateRadioContext("connection string"); // this extends Entity Framework Context
         ISearchServiceClient serviceClient = new SearchServiceClient("searchServiceName", new SearchCredentials("apiKey"));
         ISearchIndexClient indexClient = serviceClient.Indexes.GetClient("indexName");
-        int take = 1000;
         int skip = 0;
+        int take = 1000;
 
-        IEnumerable<TrackModel> batch = context.Tracks.Skip(skip).Take(take).Select(TrackModel.FromDatabaseEntity);
+        IEnumerable<TrackDocument> batch = GetBatch(context, skip, take);
         while (batch.Any()) {
             Console.Write(".");
             indexClient.Documents.Index(IndexBatch.MergeOrUpload(batch));
             skip += take;
-            batch = context.Tracks.Skip(skip).Take(take).Select(TrackModel.FromDatabaseEntity);
+            batch = GetBatch(context, skip, take);
         }
+    }
+
+    private static void GetBatch(PirateRadioContext context, int skip, int take) {
+        return context.Tracks.Skip(skip).Take(take).Select(t => {
+            return new TrackDocument() {
+                TrackKey = t.TrackKey.ToString(),
+                TrackTitle = t.TrackTitle,
+                ArtistName = t.Artist.ArtistName,
+                AlbumName = t.AlbumName,
+                GenreName = t.Genre.GenreName
+            }
+        });
     }
 }
 {% endhighlight %}
@@ -98,31 +94,31 @@ Now that we've got data pushed into the index, we need to use it for real. To go
 #### Refactored Code
 To isolate the rest of my code from understanding what's powering search externally, I put the Azure clients behind an interface which I hoped would be generic enough that I could reuse it if I decided to test out the other Search As A Service offerings later. This also meant creating a small POCO in my namespace for the search results. Again, for my use case this didn't need to be a big complex entity. I just wanted to know the current set of search results, and the total number of possible results.
 
-> ISearchService.cs
-{:.filename}
-{% highlight csharp %}
-using System.Collections.Generic;
-
-public interface ISearchService {
-    SearchResult<TrackModel> Search(string searchText, int skip, int take);
-
-    void UploadBatch(IEnumerable<TrackModel> batch);
-}
-{% endhighlight %}
-
 > SearchResult.cs
 {:.filename}
 {% highlight csharp %}
 using System.Collections.Generic;
 
 public class SearchResult {
-    public IEnumerable<TrackModel> Items { get; set; }
+    public IEnumerable<TrackDocument> Items { get; set; }
     public long? TotalItems { get; set; }
 
-    public SearchResult(IEnumerable<TrackModel> items, long? totalItems)     {
+    public SearchResult(IEnumerable<TrackDocument> items, long? totalItems)     {
         Items = items;
         TotalItems = totalItems;
     }
+}
+{% endhighlight %}
+
+> ISearchService.cs
+{:.filename}
+{% highlight csharp %}
+using System.Collections.Generic;
+
+public interface ISearchService {
+    SearchResult Search(string searchText, int skip, int take);
+    void DeleteBatch(IEnumerable<TrackDocument> batch);
+    void UploadBatch(IEnumerable<TrackDocument> batch);
 }
 {% endhighlight %}
 
@@ -137,12 +133,13 @@ using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Linq;
 
-public class AzureSearchService : ISearchService {
-    // only really used to create the index client
+public class AzureSearchService : ISearchService
+{
     private ISearchServiceClient serviceClient;
     private ISearchIndexClient indexClient;
 
-    public AzureSearchService(IOptions<SearchOptions> options) {
+    public AzureSearchService(IOptions<SearchOptions> options)
+    {
         SearchCredentials credentials = new SearchCredentials(options.Value.ApiKey);
         serviceClient = new SearchServiceClient(options.Value.SearchServiceName, credentials);
         indexClient = serviceClient.Indexes.GetClient(options.Value.IndexName);
@@ -154,12 +151,22 @@ public class AzureSearchService : ISearchService {
             Skip = skip,
             Top = take
         };
-        DocumentSearchResult<TrackModel> result = indexClient.Documents.Search<TrackModel>(searchText, parameters);
+
+        DocumentSearchResult<TrackDocument> result = indexClient.Documents
+            .Search<TrackDocument>(searchText, parameters);
         return new SearchResult(result.Results.Select(r => r.Document), result.Count);
     }
 
-    public void UploadBatch(IEnumerable<TrackModel> batch) {
-        indexClient.Documents.Index(IndexBatch.MergeOrUpload(batch));
+    public void DeleteBatch(IEnumerable<TrackDocument> batch) {
+        if (batch.Any()) {
+            indexClient.Documents.Index(IndexBatch.Delete(batch));
+        }
+    }
+
+    public void UploadBatch(IEnumerable<TrackDocument> batch) {
+        if (batch.Any()) {
+            indexClient.Documents.Index(IndexBatch.MergeOrUpload(batch));
+        }
     }
 }
 {% endhighlight %}
@@ -175,7 +182,14 @@ public class SearchOptions {
 {% endhighlight %}
 
 #### Integrating Into Web App
-Now that I've got the code set up in an injectable manner, I need to update my web app's Startup.cs, and then create or update the Controller that I want to search from.
+Now that I've got the code set up in an injectable manner, I need to update my website to use the enhanced functionality. The basic steps are:
+1. Add a reference to the package
+1. Update my Startup.cs to make sure I can inject my new dependency
+1. Replace my old implementation of search with the new one.
+
+<div class="alert alert-info" role="alert">
+Configuration.GetSection() requires the Microsoft.Extensions.Options.ConfigurationExtensions package
+</div>
 
 > Startup.cs
 {:.filename}
@@ -191,7 +205,7 @@ public class Startup {
 }
 {% endhighlight %}
 
-This code isn't the cleanest, because there's a bit of math and object transformation going on directly in the Controller. By this point, you should have a pretty good idea of what code you need to implement for your use case.
+This Controller code isn't the cleanest because there's a bit of math and multiple object transformations going on directly in the Controller. In my actual code I would probably make a little helper class to encapsulate this bit of code to make it more re-usable. However, for this blog I moved all the code into the controller to make it easier to understand what changes I needed to make to swap out the old code and replace it with the new code.  I also rolled my own pagination implementation in the web app, but I'd recommend checking out [the X.PagedList Github project](https://github.com/dncuug/X.PagedList) if you want something pre-built.
 
 > TrackController.cs
 {:.filename}
@@ -200,6 +214,7 @@ using PirateRadio.Search;
 
 public class SearchController : Controller {
     private ISearchService SearchService { get; set; }
+    // private PirateRadioContext Context { get; set; }
 
     public SearchController(ISearchService search) {
         SearchService = search;
@@ -210,15 +225,14 @@ public class SearchController : Controller {
         int pageSize = 10;
         int index = page ?? 1;
         int skip = (index - 1) * pageSize;
+        // IQueryable<Track> tracks = Context.Tracks.Search(search, skip, pageSize);
         SearchResult results = SearchService.Search(search, skip, pageSize);
         if (results.TotalItems > 0) {
-            // Convert the Search domain model into a View Model that our view understands
-            var tracks = results.Items.Select(TrackViewModel.FromSearchResults).ToList();
-            var totalPages = Convert.ToInt32(Math.Ceiling((double)results.TotalItems / pageSize));
+            int totalPages = Convert.ToInt32(Math.Ceiling((double)results.TotalItems / pageSize));
             // This view model is used for paginated result sets. It has fields for:
             // What are the items on this page? What page of results am I on?
             // How many total pages of results are there? What was the original search string?
-            var viewModel = new PaginatedList<TrackViewModel>(tracks, index, totalPages, search);
+            PaginatedList viewModel = new PaginatedList(results.Items, index, totalPages, search);
             return new ObjectResult(results);
         }
         // Otherwise, return 404
@@ -228,7 +242,85 @@ public class SearchController : Controller {
 {% endhighlight %}
 
 I could keep going and write up all the code on the UI side as well, but I decided against it. The UI is just rendering the search results that come back from the service, regardless of the backing engine. In fact, since I had already built a primitive search function on my primary database, I had already built this UI. And because the returned view model didn't change at all, I was able to fire up my web server, and test out the search page. Just as expected, searching for `"Yellow Submarine"` returned exactly 19 results, while `Yellow Submarine` returned a lot more, including Coldplay's "Yellow" and Björk's "Submarine."
+
 <img src="{{ '/assets/img/2019-01-09-azure-search-02.png' | relative_url }}" class="img-fluid" alt="Azure Search Explorer">
+
+#### Integrating Into Console App
+
+The Website isn't the only place I needed to make changes. I have a console app that scans my music library on disk for changes, and updates my database. I need the Search Index to get the same set of updates as well.
+
+<div class="alert alert-info" role="alert">
+Console apps by default don't include the Microsoft.Extensions.DependencyInjection package
+</div>
+
+> Program.cs
+{:.filename}
+{% highlight csharp %}
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using PirateRadio.Search;
+
+class Program {
+    static void Main(string[] args) {
+        IServiceCollection serviceCollection = new ServiceCollection();
+        ConfigureServices(serviceCollection);
+        ServiceProvider serviceProvider = serviceCollection.BuildServiceProvider();
+
+        // my console apps actual code
+        Processor processor = serviceProvider.GetService<Processor>();
+        processor.ScanAndUpdate();
+    }
+
+    private static void ConfigureServices(IServiceCollection services) {
+        // omitting other config for brevity
+        services.AddOptions();
+        services.AddSingleton<ISearchService, AzureSearchService>();
+        services.Configure<SearchOptions>(configuration.GetSection("PirateRadio.Search"));
+    }
+}
+{% endhighlight %}
+
+> Processor.cs
+{:.filename}
+{% highlight csharp %}
+public class Processor {
+    private PirateRadioContext Context { get; set; }
+    private ISearchService SearchService { get; set; }
+
+    public SearchProcessor(PirateRadioContext context, ISearchService search) {
+        Context = context;
+        SearchService = search;
+    }
+
+    public void Process() {
+        // omitting other code for brevity
+        // these two methods are just added onto the end of the internal methods
+        // order of execution for these two methods does not matter
+        UpsertChangedTracks();
+        RemoveDeletedTracks();
+    }
+
+    private void UpsertChangedTracks() {
+        IEnumerable<TrackDocument> batch = Database.FindUpdatedTracks().Select(this.ToDocument);
+        SearchService.UploadBatch(batch);
+    }
+
+    private void RemoveDeletedTracks() {
+        IEnumerable<TrackDocument> batch = Database.FindDeletedTracks().Select(this.ToDocument);
+        SearchService.DeleteBatch(batch);
+    }
+
+    private TrackDocument ToDocument(ProcessedTrack track) {
+        return new TrackDocument() {
+            TrackKey = track.TrackKey.ToString(),
+            TrackTitle = track.TrackTitle,
+            AlbumName = track.AlbumName,
+            ArtistName = track.ArtistName,
+            GenreName = track.GenreName
+        };
+    }
+}
+{% endhighlight %}
 
 ### Resources
 * [Clemens Siebler's Quick Start Tutorial](https://clemenssiebler.com/azure-search-quickstart-tutorial/)
