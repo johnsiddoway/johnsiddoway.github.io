@@ -19,7 +19,7 @@ email: john.pez.s@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   A personal blog, covering topics such as software engineering, video games,
   and tabletop gaming.
-baseurl: "" # the subpath of your site, e.g. /blog
+baseurl: "/blog" # the subpath of your site, e.g. /blog
 url: "https://johnsiddoway.net" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  johnsiddoway
 repository: johnsiddoway/johnsiddoway.github.io
