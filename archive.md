@@ -1,9 +1,9 @@
 ---
-# Feel free to add content and custom Front Matter to this file.
-# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
+title: Post Archive
 ---
+
 <ul class="list-unstyled">
-  {% for post in site.posts limit:5 %}
+  {% for post in site.posts %}
     <h3 class="text-primary"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>
     <div class="border-top border-bottom mb-3">
         <div class="d-inline">
@@ -21,9 +21,3 @@
     </div>
   {% endfor %}
 </ul>
-
-{% if site.posts.size > 5 %}
-<div class="text-center">
-  <h3><a href="{{ '/archive.html' | relative_url }}">Blog Archive</a></h3>
-</div>
-{% endif %}
