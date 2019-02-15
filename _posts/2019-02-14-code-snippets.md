@@ -53,6 +53,8 @@ table.logo th { width: 506px; } <!-- Any good looking px, em, or % -->
 ```
 
 ### Image Zoom Magnifying Glass
+[Updated Article]({{ site.baseurl }}{% post_url 2019-02-15-magnify %})
+
 [Original Article](http://thecodeplayer.com/walkthrough/magnifying-glass-for-images-using-jquery-and-css3)
 
 I made a small jQuery plugin out of the image magnification tool above. You just have to initialize it on the img elements to zoom on hover, with CSS class(es) that define how you want the magnifier to look. Note to self: I should post this as its own article at some point too.
