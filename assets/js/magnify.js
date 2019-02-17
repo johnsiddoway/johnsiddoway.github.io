@@ -1,56 +1,61 @@
 (function( $ ) {
 	$.fn.magnify = function( options ) {
-		
 		var settings = $.extend({
 			original: '',
 			magnifiedClass: '',
 			magnifiedCSS: ''
 		}, options);
-		
-		this.filter('img').each(function() {
-			var i = $(this);
-			var io = new Image();
-			io.src = i.attr('src');
-			io.onload = function() {
-				var w = io.width;
-				var h = io.height;
-				
-				i.wrap(document.createElement('div'));
-				var m = document.createElement('div');
-				m.className = settings.magnifiedClass;
-				m.style.backgroundImage = "url('" + i.attr("src") + "')";
-				var p = i.parent();
-				p.append(m);
-				p.mousemove(function(e){
-					var div = $('div', this),
-						img = $('img', this),
-						o = $(this).offset();
-					var mx = e.pageX - o.left;
-					var my = e.pageY - o.top;
-					
-					if(mx < $(this).width() && my < $(this).height() && mx > 0 && my > 0) {
-						div.fadeIn(100);
-					} else {
-						div.fadeOut(100);
-					}
-					if(div.is(":visible")) {
-						var rx = Math.round(mx/img.width()*w - div.width()/2)*-1;
-						var ry = Math.round(my/img.height()*h - div.height()/2)*-1;
-						div[0].style.backgroundPosition = rx + "px " + ry + "px";
-						div[0].style.left = (mx - div.width()/2) + "px";
-						div[0].style.top = (my + div.height()) + "px";
-					}
+		function getBackgroundColor(element) {
+			var $e = $(element);
+			var color = $e.css("background-color");
+			if ((color !== 'rgba(0, 0, 0, 0)') && (color !== 'transparent') && (color !== '')) { return color; }
+			else if ($e.is("body")) { return false; }
+			else { return getBackgroundColor($e.parent()); }
+		};
+		this.filter('img').one("load", function() {
+			// these variables are used in the mousemove listener
+			var cw = this.width;
+			var ch = this.height;
+			var ow = this.naturalWidth;
+			var oh = this.naturalHeight;
+			var parent = document.createElement('div');
+			this.parentNode.replaceChild(parent, this);
+			parent.appendChild(this);
+			var lens = document.createElement('div');
+			lens.className = settings.magnifiedClass;
+			lens.style.backgroundColor = getBackgroundColor(this);
+			lens.style.backgroundImage = "url('" + this.src + "')";
+			lens.style.backgroundRepeat = 'no-repeat';
+			parent.appendChild(lens);
+			parent.addEventListener('mouseleave', function() {
+				this.querySelectorAll('div').forEach(function(lens){
+					$(lens).fadeOut();
 				});
-				p.mouseleave(function() {
-					this.querySelectorAll('div').forEach(function(element){
-						element.style.display = 'none';
-					});
-				});
+			});
+			parent.addEventListener('mousemove', function(e) {
+				var rect = this.getBoundingClientRect();
+				var left = rect.left + document.documentElement.scrollLeft;
+				var top = rect.top + document.documentElement.scrollTop;
+				var ox = Math.round((e.pageX - left)/cw*ow - lens.offsetWidth/2)*-1;
+				var oy = Math.round((e.pageY - top)/ch*oh - lens.offsetHeight/2)*-1;
+
+				$(lens).fadeIn('slow');
+				lens.style.backgroundPosition = ox + "px " + oy + "px";
+				// these two position the lens
+				// don't position the lens directly over the mouse,
+				// or else the mouseleave function won't trigger and the lens won't go away
+				lens.style.left = e.pageX - (left/2) + "px";
+				lens.style.top = e.pageY - lens.offsetHeight + "px";
+			});
+		}).each(function() {
+			if(this.complete) {
+				$(this).trigger('load'); // For jQuery >= 3.0
 			}
 		});
+		return this;
 	};
 }( jQuery ));
 
 $(document).ready(function(){
-    $('.magnify-this').magnify({magnifiedClass:'magnify-lens'})
+	$('.magnify-this').magnify({magnifiedClass:'magnify-lens'});
 });
