@@ -1,15 +1,10 @@
 // Bootstrap 4 Variables
-$body-bg: #39393a;
-$body-color: #dddddd;
-
 $primary: #3ca2a2;
-$dark: #222222;
 
 $theme-colors: (
-  "gray": $body-bg
+  "gray-300": #dee2e6,
+  "gray-400": #ced4da,
+  "gray-500": #adb5bd
 );
 
-// Jekyll-clean-dark variables
-$footer-background-color: #292c2f;
-$gray-950: #292929;
-$gray-850: #333;
+$hr-border-color: #212529; // gray-900

@@ -1,12 +1,12 @@
 .rating-ltr {
-	color: #ddd; /* Personal choice */
+	color: #fff; /* Personal choice */
 }
 
 .rating,
 .rating-single {
 	direction: rtl;
 	unicode-bidi: bidi-override;
-	color: #ddd; /* Personal choice */
+	color: #fff; /* Personal choice */
 }
 
 .rating input,
