@@ -14,11 +14,12 @@
 		};
 		this.filter('img').one("load", function() {
 			// these variables are used in the mousemove listener
-			var cw = this.width;
-			var ch = this.height;
-			var ow = this.naturalWidth;
-			var oh = this.naturalHeight;
+			var targetWidth = this.width;
+			var targetHeight = this.height;
+			var originalWidth = this.naturalWidth;
+			var originalHeight = this.naturalHeight;
 			var parent = document.createElement('div');
+			parent.style.position = 'relative';
 			this.parentNode.replaceChild(parent, this);
 			parent.appendChild(this);
 			var lens = document.createElement('div');
@@ -34,18 +35,18 @@
 			});
 			parent.addEventListener('mousemove', function(e) {
 				var rect = this.getBoundingClientRect();
-				var left = rect.left + document.documentElement.scrollLeft;
-				var top = rect.top + document.documentElement.scrollTop;
-				var ox = Math.round((e.pageX - left)/cw*ow - lens.offsetWidth/2)*-1;
-				var oy = Math.round((e.pageY - top)/ch*oh - lens.offsetHeight/2)*-1;
+				var targetLeft = rect.left + document.documentElement.scrollLeft;
+				var targetTop = rect.top + document.documentElement.scrollTop;
+				var originalX = Math.round((e.pageX - targetLeft)/targetWidth*originalWidth - lens.offsetWidth/2)*-1;
+				var originalY = Math.round((e.pageY - targetTop)/targetHeight*originalHeight - lens.offsetHeight/2)*-1;
 
 				$(lens).fadeIn('slow');
-				lens.style.backgroundPosition = ox + "px " + oy + "px";
-				// these two position the lens
+				lens.style.backgroundPosition = originalX + "px " + originalY + "px";
+				// these two position the lens very close to the mouse
 				// don't position the lens directly over the mouse,
 				// or else the mouseleave function won't trigger and the lens won't go away
-				lens.style.left = e.pageX - (left/2) + "px";
-				lens.style.top = e.pageY - lens.offsetHeight + "px";
+				lens.style.left = e.pageX - targetLeft + "px";
+				lens.style.top = e.pageY - targetTop - lens.offsetHeight + "px";
 			});
 		}).each(function() {
 			if(this.complete) {
