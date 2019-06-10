@@ -11,7 +11,7 @@
     {% endfor %}
     {% seo %}
   </head>
-  <body class="d-flex flex-column" style="min-height: 100vh">
+  <body class="d-flex flex-column">
       <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
         <div class="container">
           <a class="navbar-brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
@@ -33,7 +33,7 @@
     <div class="container">
       <div class="row">
         <div class="col-md-9">
-          <main role="main" class="bg-gray-300 mb-4">
+          <main role="main" class="mb-4">
             {{ content }}
           </main>
         </div>
@@ -50,7 +50,7 @@
       </div>
     </div>
 
-    <footer class="mt-auto bg-dark text-light">
+    <footer class="mt-auto">
       <p>{{ site.author }} &copy; {{ site.copyright }}</p>
       <p><a href="{{ site.github.repository_url }}">View on GitHub</a></p>
     </footer>

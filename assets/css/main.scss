@@ -5,14 +5,15 @@
 @import 'bootstrap/bootstrap';
 @import 'default'; // pygments theme
 
-/* Custom styling */
-main {
-  padding: 1.25rem;
-  margin-bottom: 1.5rem;
-  border-radius: .25rem;
+// custom styling
+body {
+  background-image: url("../img/hexellence.png");
+  min-height: 100vh;
 }
 
 footer {
+  background-color: $dark;
+  color: $gray-100;
   font: normal 16px sans-serif;
   padding: 1.5rem 1.75rem;
   text-align: center;
@@ -20,6 +21,13 @@ footer {
   p {
     margin-bottom: 0.25em;
   }
+}
+
+main {
+  background-color: $gray-300;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-radius: .25rem;
 }
 
 nav {
