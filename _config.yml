@@ -26,7 +26,6 @@ repository: johnsiddoway/johnsiddoway.github.io
 copyright: 2018-2020
 
 # Build settings
-theme: minima
 plugins:
   - jekyll-seo-tag
 sass:
