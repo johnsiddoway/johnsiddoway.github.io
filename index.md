@@ -1,7 +1,10 @@
 ---
 # Feel free to add content and custom Front Matter to this file.
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
+
+layout: default
 ---
+
 <ul class="list-unstyled">
   {% for post in site.posts limit:5 %}
     <h3 class="text-primary"><a href="{{ post.url | relative_url }}">{{ post.title }}</a></h3>

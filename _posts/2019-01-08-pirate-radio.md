@@ -1,4 +1,5 @@
 ---
+layout: post
 title:  "Pirate Radio"
 date:   2019-01-08
 description: A brief history on a personal project

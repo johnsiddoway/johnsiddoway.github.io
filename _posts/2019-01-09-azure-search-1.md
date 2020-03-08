@@ -1,4 +1,5 @@
 ---
+layout: post
 title:  "Azure Search Part 1"
 date:   2019-01-09
 description: Plugging Azure Search into Pirate Radio

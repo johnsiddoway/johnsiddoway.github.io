@@ -1,4 +1,5 @@
 ---
+layout: post
 title:  "Azure Search Part 2"
 date:   2019-01-10
 description: Discussing my experience with Azure Search

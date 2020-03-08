@@ -23,11 +23,9 @@ baseurl: "/blog" # the subpath of your site, e.g. /blog
 url: "https://johnsiddoway.net" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  johnsiddoway
 repository: johnsiddoway/johnsiddoway.github.io
-copyright: 2018-2019
+copyright: 2018-2020
 
 # Build settings
-highlighter: rouge
-markdown: kramdown
 plugins:
   - jekyll-seo-tag
 sass:
