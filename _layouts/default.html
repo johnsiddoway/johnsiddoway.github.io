@@ -12,23 +12,23 @@
     {% seo %}
   </head>
   <body class="d-flex flex-column">
-      <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
-        <div class="container">
-          <a class="navbar-brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarCollapse">
-            <ul class="navbar-nav ml-auto">
-            {% for item in site.data.navigation %}
-                <li class="nav-item{% if page.url == item.link %} active{% endif %}">
-                    <a class="nav-link" href="{{ item.link | relative_url }}">{{ item.name }}</a>
-                </li>
-            {% endfor %}
-            </ul>
-          </div>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+      <div class="container">
+        <a class="navbar-brand" href="{{ '/' | relative_url }}">{{ site.title }}</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav ml-auto">
+          {% for item in site.data.navigation %}
+              <li class="nav-item{% if page.url == item.link %} active{% endif %}">
+                  <a class="nav-link" href="{{ item.link | relative_url }}">{{ item.name }}</a>
+              </li>
+          {% endfor %}
+          </ul>
         </div>
-      </nav>
+      </div>
+    </nav>
 
     <div class="container">
       <div class="row">
