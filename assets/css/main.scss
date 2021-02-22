@@ -33,7 +33,8 @@ nav {
 }
 
 /* Customize Pygments Theme */
-figure.highlight {
+figure.highlight,
+pre.highlight {
   background-color: $gray-200;
 }
 
