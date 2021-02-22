@@ -30,7 +30,7 @@ There are two basic CSS features being used here. We are listing out the inputs 
 #### Directionality override
 > HTML
 {:.filename}
-{% highlight html %}
+```html
 <div class="rating">
     <input id="rating-5" type="radio" name="rating" value="5"/>
     <input id="rating-4" type="radio" name="rating" value="4"/>
@@ -38,16 +38,16 @@ There are two basic CSS features being used here. We are listing out the inputs 
     <input id="rating-2" type="radio" name="rating" value="2"/>
     <input id="rating-1" type="radio" name="rating" value="1"/>
 </div>
-{% endhighlight %}
+```
 
 > CSS
 {:.filename}
-{% highlight css %}
+```css
 .rating {
     direction: rtl;
     unicode-bidi: bidi-override;
 }
-{% endhighlight %}
+```
 
 Star Ratings are typically viewed with the lowest score on the left, and the highest score on the right. In our case, 1 to 5. By setting this to "right to left" and then putting our elements highest-to-lowest when we define them, they are *rendered* left to right. By itself this isn't that useful. Here's what our Star Ratings would look like without it, though:
 
@@ -63,14 +63,14 @@ Current Rating: <span id="star-ltr-value"></span>  <span class="text-muted"><em>
 #### Subsequent-sibling combinator
 > CSS
 {:.filename}
-{% highlight css %}
+```css
 .rating label:hover,
 .rating label:hover ~ label,
 .rating input:checked + label,
 .rating input:checked + label ~ label {
     color: #ffc107;
 }
-{% endhighlight %}
+```
 
 The `.rating input:checked + label` line uses the `+` selector to set **just** the label immediately after the checked radio button, which is the current value.
 
@@ -90,7 +90,7 @@ Current Rating: <span id="star-single-value"></span> <span class="text-muted"><e
 #### All Together
 >HTML
 {:.filename}
-{% highlight html %}
+```html
 <div class="rating">
     <input id="rating-5" type="radio" name="rating" value="5"/>
     <label for="rating-5"><i class="fas fa-2x fa-star"></i></label>
@@ -103,11 +103,11 @@ Current Rating: <span id="star-single-value"></span> <span class="text-muted"><e
     <input id="rating-1" type="radio" name="rating" value="1"/>
     <label for="rating-1"><i class="fas fa-2x fa-star"></i></label>
 </div>
-{% endhighlight %}
+```
 
 >CSS
 {:.filename}
-{% highlight css %}
+```css
  /* Color here is used for labels higher than your current value. */
  /* Color choice is up to you */
 .rating {
@@ -129,7 +129,7 @@ Current Rating: <span id="star-single-value"></span> <span class="text-muted"><e
 .rating input:checked + label ~ label {
     color: #ffc107;
 }
-{% endhighlight %}
+```
 
 <div class="rating" style="width: 20rem">
     <input id="rating-final-5" type="radio" name="rating-final" value="5"/><label for="rating-final-5"><i class="fas fa-2x fa-star"></i></label>
@@ -145,7 +145,7 @@ If you are including the star rating in a form with an explicit `submit` button,
 
 >javascript
 {:.filename}
-{% highlight javascript %}
+```javascript
 $(document).ready(function() { // using jQuery is not required
     // on page load, display the default value
     var currentValue = $('input[name="rating"]:checked').val();
@@ -156,12 +156,12 @@ $(document).ready(function() { // using jQuery is not required
         $('#star-value').text(this.value);
     });
 });
-{% endhighlight %}
+```
 
 Or, for the [VanillaJS](http://vanilla-js.com/) crowd:
 >javascript
 {:.filename}
-{% highlight javascript %}
+```javascript
 document.addEventListener("DOMContentLoaded", function() {
     // on page load, display the default value
     var currentValue = document.querySelector('input[name="rating"]:checked').value;
@@ -174,7 +174,7 @@ document.addEventListener("DOMContentLoaded", function() {
         };
     }
 });
-{% endhighlight %}
+```
 
 ### Resources
 * [CodePen Version](https://codepen.io/pezmotion/pen/RQERdm)

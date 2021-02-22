@@ -29,7 +29,7 @@ Once you have the service and index defined, you can start shoving data into it.
 
 > TrackDocument.cs
 {:.filename}
-{% highlight csharp %}
+```csharp
 public class TrackDocument {
     public string TrackKey { get; set; }
     public string TrackTitle { get; set; }
@@ -37,11 +37,11 @@ public class TrackDocument {
     public string AlbumName { get; set; }
     public string GenreName { get; set; }
 }
-{% endhighlight %}
+```
 
 > Backfill.cs
 {:.filename}
-{% highlight csharp %}
+```csharp
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using PirateRadio.Search;
@@ -79,7 +79,7 @@ public class Backfill {
         });
     }
 }
-{% endhighlight %}
+```
 
 After running this script (or something like it), you should be able to see the index full of data. You can also use the Search Explorer to start messing around with querying your data. Here's a screenshot of me searching the index for 'exactly Yellow Submarine' with double quotes, and finding only 19 search results. These include 13 tracks from the [Yellow Submarine soundtrack](https://en.wikipedia.org/wiki/Yellow_Submarine_(album)), the original track from [Revolver](https://en.wikipedia.org/wiki/Revolver_(Beatles_album)), the re-release on the [1](https://en.wikipedia.org/wiki/1_(Beatles_album)) compilation album, and 4 covers.
 
@@ -97,7 +97,7 @@ To isolate the rest of my code from understanding what's powering search externa
 
 > SearchResult.cs
 {:.filename}
-{% highlight csharp %}
+```csharp
 using System.Collections.Generic;
 
 public class SearchResult {
@@ -109,11 +109,11 @@ public class SearchResult {
         TotalItems = totalItems;
     }
 }
-{% endhighlight %}
+```
 
 > ISearchService.cs
 {:.filename}
-{% highlight csharp %}
+```csharp
 using System.Collections.Generic;
 
 public interface ISearchService {
@@ -121,13 +121,13 @@ public interface ISearchService {
     void DeleteBatch(IEnumerable<TrackDocument> batch);
     void UploadBatch(IEnumerable<TrackDocument> batch);
 }
-{% endhighlight %}
+```
 
 Now I just needed to implement the interface, using Azure as the backing search engine. This class also includes a constructor that can be used by .NET's build in [Dependency Injection](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/dependency-injection?view=aspnetcore-2.2) framework.
 
 > AzureSearchService.cs
 {:.filename}
-{% highlight csharp %}
+```csharp
 using Microsoft.Azure.Search;
 using Microsoft.Azure.Search.Models;
 using Microsoft.Extensions.Options;
@@ -170,17 +170,17 @@ public class AzureSearchService : ISearchService
         }
     }
 }
-{% endhighlight %}
+```
 
 > SearchOptions.cs
 {:.filename}
-{% highlight csharp %}
+```csharp
 public class SearchOptions {
     public string SearchServiceName { get; set; }
     public string ApiKey { get; set; }
     public string IndexName { get; set; }
 }
-{% endhighlight %}
+```
 
 #### Integrating Into Web App
 Now that I've got the code set up in an injectable manner, I need to update my website to use the enhanced functionality. The basic steps are:
@@ -194,7 +194,7 @@ Configuration.GetSection() requires the Microsoft.Extensions.Options.Configurati
 
 > Startup.cs
 {:.filename}
-{% highlight csharp %}
+```csharp
 using PirateRadio.Search; // The namespace I put all of the code samples from above
 
 public class Startup {
@@ -204,13 +204,13 @@ public class Startup {
         services.Configure<SearchOptions>(Configuration.GetSection("PirateRadio.Search"));
     }
 }
-{% endhighlight %}
+```
 
 This Controller code isn't the cleanest because there's a bit of math and multiple object transformations going on directly in the Controller. In my actual code I would probably make a little helper class to encapsulate this bit of code to make it more re-usable. However, for this blog I moved all the code into the controller to make it easier to understand what changes I needed to make to swap out the old code and replace it with the new code.  I also rolled my own pagination implementation in the web app, but I'd recommend checking out [the X.PagedList Github project](https://github.com/dncuug/X.PagedList) if you want something pre-built.
 
 > TrackController.cs
 {:.filename}
-{% highlight csharp %}
+```csharp
 using PirateRadio.Search;
 
 public class SearchController : Controller {
@@ -240,7 +240,7 @@ public class SearchController : Controller {
         return NotFound();
     }
 }
-{% endhighlight %}
+```
 
 I could keep going and write up all the code on the UI side as well, but I decided against it. The UI is just rendering the search results that come back from the service, regardless of the backing engine. In fact, since I had already built a primitive search function on my primary database, I had already built this UI. And because the returned view model didn't change at all, I was able to fire up my web server, and test out the search page. Just as expected, searching for `"Yellow Submarine"` returned exactly 19 results, while `Yellow Submarine` returned a lot more, including Coldplay's "Yellow" and Björk's "Submarine."
 
@@ -256,7 +256,7 @@ Console apps by default don't include the Microsoft.Extensions.DependencyInjecti
 
 > Program.cs
 {:.filename}
-{% highlight csharp %}
+```csharp
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PirateRadio.Search;
@@ -279,11 +279,11 @@ class Program {
         services.Configure<SearchOptions>(configuration.GetSection("PirateRadio.Search"));
     }
 }
-{% endhighlight %}
+```
 
 > Processor.cs
 {:.filename}
-{% highlight csharp %}
+```csharp
 public class Processor {
     private PirateRadioContext Context { get; set; }
     private ISearchService SearchService { get; set; }
@@ -321,7 +321,7 @@ public class Processor {
         };
     }
 }
-{% endhighlight %}
+```
 
 ### Resources
 * [Clemens Siebler's Quick Start Tutorial](https://clemenssiebler.com/azure-search-quickstart-tutorial/)
