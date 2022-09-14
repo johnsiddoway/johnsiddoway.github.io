@@ -6,6 +6,16 @@
 @import 'default'; // pygments theme
 
 // custom styling
+blockquote {
+    border-left: 10px solid #ccc;
+    margin: 0 0 1rem 0;
+    padding: 0.5em 10px;
+
+    p {
+        margin-bottom: 0;
+    }
+}
+
 body {
   background-color: $gray-100;
   min-height: 100vh;
